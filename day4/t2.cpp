@@ -1,51 +1,54 @@
 #include <fstream>
 #include <iostream>
-#include <regex>
+#include <sstream>
 #include <unordered_set>
 #include <set>
 #include <algorithm>
 #include <numeric>
 #include <vector>
+#include <chrono>
 
 using std::string, std::cout, std::cin;
 
-int main() {
-    string filename;
-    cout << "Enter input file name: \n";
-    cin >> filename;
-    std::ifstream input(filename);
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        cout << "Usage is ./task <filename>" <<"\n";
+        return 0;
+    }
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+
+    std::ifstream input(argv[1]);
 
     if (!input.is_open()) {
         cout << "File was not opened correctly\n";
         return -1;
     }
     string line;
-    std::regex num_regex("((\\d+))");
+    // std::regex num_regex("((\\d+))");
 
     std::vector<int> card_matches;
     while (std::getline(input, line)) {
         size_t col_idx = line.find_first_of(':');
         size_t bar_idx = line.find_first_of('|');
 
-        std::sregex_iterator witer(line.begin()+col_idx,line.begin()+bar_idx, num_regex);
-        std::sregex_iterator end;
 
-        std::set<int> winning_nums;
-        while (witer != end) {
-            winning_nums.insert(std::stoi((*witer)[0]));
-            ++witer;
+        std::stringstream win_stream(line.substr(col_idx+1, bar_idx-col_idx-1));
+        std::unordered_set<int> winning_nums;
+        string curr;
+        while (win_stream >> curr) {
+            winning_nums.insert(std::stoi(curr));
         }
-        
-        std::sregex_iterator hiter(line.begin()+bar_idx, line.end(), num_regex);
-        std::unordered_set<int> our_nums;
-        while (hiter != end) {
-            our_nums.insert(std::stoi((*hiter)[0]));
-            ++hiter;
+
+        std::stringstream have_stream(line.substr(bar_idx+1));
+        std::unordered_set<int> have_nums;
+        while (have_stream >> curr) {
+            have_nums.insert(std::stoi(curr));
         }
 
         int matches = 0;
         for (const int wnum : winning_nums) {
-            if (our_nums.count(wnum)) {
+            if (have_nums.count(wnum)) {
                 matches++;
             }
         }
@@ -61,5 +64,11 @@ int main() {
         }
     }
 
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+
     cout << "sum: " << std::accumulate(cards.begin(),cards.end(),0) << "\n";
+
+    cout << "program runtime: " << duration.count() << " ms" << "\n";
 }
