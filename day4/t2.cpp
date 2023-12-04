@@ -2,7 +2,6 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_set>
-#include <set>
 #include <algorithm>
 #include <numeric>
 #include <vector>
@@ -65,10 +64,8 @@ int main(int argc, char* argv[]) {
     }
 
     auto end_time = std::chrono::high_resolution_clock::now();
-
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-
+    
     cout << "sum: " << std::accumulate(cards.begin(),cards.end(),0) << "\n";
-
     cout << "program runtime: " << duration.count() << " ms" << "\n";
 }
