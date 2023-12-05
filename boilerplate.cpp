@@ -21,5 +21,11 @@ int main(int argc, char* argv[]) {
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    cout << "program runtime: " << duration.count() << " ms" << "\n";
+    if (duration.count() == 0) {
+        auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+        cout << "program runtime: " << duration_us.count() << " us" << "\n";
+    } else {
+        cout << "program runtime: " << duration.count() << " ms" << "\n";
+    }
+
 }

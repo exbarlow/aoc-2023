@@ -24,7 +24,6 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     string line;
-    // std::regex num_regex("((\\d+))");
 
     std::vector<int> card_matches;
     while (std::getline(input, line)) {
