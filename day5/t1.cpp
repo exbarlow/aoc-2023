@@ -8,17 +8,13 @@ using std::string, std::cout, std::cin, std::stol;
 
 class Map {
     public:
-        Map(long dest, long source, long len): source_start(source), dest_start(dest), len(len) {
-            // this->Print();
-        } 
+        Map(long dest, long source, long len): source_start(source), dest_start(dest), len(len) {} 
 
         bool Contains(long cand) const {
             return (cand > source_start) && (cand - source_start < len);
         }
 
         long GetDest(long cand) const {
-            // this->Print();
-            // cout << "source: " << cand << " mapped to " << cand - source_start + dest_start << "\n";
             return dest_start + cand - source_start;
         }
 
@@ -69,7 +65,6 @@ void ParseSeeds(std::vector<long>& seeds, string line) {
     std::stringstream stream(line.substr(line.find_first_of(':')+1));
     string num;
     while (stream >> num) {
-        // cout << "read seed: " << num << "\n";
         seeds.push_back(std::stol(num));
     }
 }
@@ -109,25 +104,18 @@ int main(int argc, char* argv[]) {
         if (line.find("seeds:") != string::npos) {
             ParseSeeds(seeds, line);
         } else if (line.find("to-soil") != string::npos) {
-            // cout << "seed to soil " << "\n";
             seed_to_soil.Fill(input);
         } else if (line.find("to-fert") != string::npos) {
-            // cout << "soil to fert" << "\n";
             soil_to_fert.Fill(input);
         } else if (line.find("to-water") != string::npos) {
-            // cout << "fert to water" << "\n";
             fert_to_water.Fill(input);
         } else if (line.find("to-light") != string::npos) {
-            // cout << "water to ligth" << "\n";
             water_to_light.Fill(input);
         } else if (line.find("to-temp") != string::npos) {
-            // cout << "light to temp" << "\n";
             light_to_temp.Fill(input);
         } else if (line.find("to-humid") != string::npos) {
-            // cout << "temp to humid" << "\n";
             temp_to_humid.Fill(input);
         } else if (line.find("to-loc") != string::npos) {
-            // cout << "humid to location" << "\n";
             humid_to_loc.Fill(input);
         }
 
@@ -135,7 +123,6 @@ int main(int argc, char* argv[]) {
     long curr_min = LONG_MAX;
     for (const long& seed : seeds) {
         long location = humid_to_loc.GetMappedVal(temp_to_humid.GetMappedVal(light_to_temp.GetMappedVal(water_to_light.GetMappedVal(fert_to_water.GetMappedVal(soil_to_fert.GetMappedVal(seed_to_soil.GetMappedVal(seed)))))));
-        // cout << "final location of " << seed << ": " << location << "\n";
         curr_min = std::min(curr_min, location);
     }
 
