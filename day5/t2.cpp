@@ -80,40 +80,17 @@ class Mapping {
 
             for (size_t i = 0; i < ranges.size(); i++) {
                 SeedRange seed_range = ranges[i];
-                // cout << "processing range: ";
-                // PrintRange(seed_range);
-                // cout << std::endl;
                 bool found = false;
                 for (const Map& m : maps) {
                     if (!m.Overlaps(seed_range)) {
                         continue;
                     } else {
                         found = true;
-                        //todo: remove debug
-                        // PrintRange(seed_range);
-                        // cout << "overlaps map: ";
-                        // m.PrintMap();
-                        // cout << "\n";
-                        
-                        // cout << "transformed overlap: ";
-                        // PrintRange(m.TranfsormOverlap(seed_range));
-                        // cout << std::endl;
                         new_ranges.push_back(m.TranfsormOverlap(seed_range));
-
                         if (m.OvershootsBegin(seed_range)) {
-
-                            // cout << "overshoot begin: ";
-                            // PrintRange(m.GetOvershootBegin(seed_range));
-                            // cout << std::endl;
-
                             ranges.push_back(m.GetOvershootBegin(seed_range));
                         }
                         if (m.OvershootsEnd(seed_range)) {
-
-                            // cout << "overshoot end: ";
-                            // PrintRange(m.GetOvershootEnd(seed_range));
-                            // cout << std::endl;
-
                             ranges.push_back(m.GetOvershootEnd(seed_range));
                         }
                         break;
@@ -184,72 +161,35 @@ int main(int argc, char* argv[]) {
     Mapping humid_to_loc;
 
     while (std::getline(input, line)) {
-        // skip empty lines
         if (line.empty()) {continue;}
 
         if (line.find("seeds:") != string::npos) {
             ParseSeedRanges(seed_ranges, line);
         } else if (line.find("to-soil") != string::npos) {
-            // cout << "seed to soil " << "\n";
             seed_to_soil.Fill(input);
         } else if (line.find("to-fert") != string::npos) {
-            // cout << "soil to fert" << "\n";
             soil_to_fert.Fill(input);
         } else if (line.find("to-water") != string::npos) {
-            // cout << "fert to water" << "\n";
             fert_to_water.Fill(input);
         } else if (line.find("to-light") != string::npos) {
-            // cout << "water to ligth" << "\n";
             water_to_light.Fill(input);
         } else if (line.find("to-temp") != string::npos) {
-            // cout << "light to temp" << "\n";
             light_to_temp.Fill(input);
         } else if (line.find("to-humid") != string::npos) {
-            // cout << "temp to humid" << "\n";
             temp_to_humid.Fill(input);
         } else if (line.find("to-loc") != string::npos) {
-            // cout << "humid to location" << "\n";
             humid_to_loc.Fill(input);
         }
 
     }
-    // cout << "Original ranges" << std::endl;
-    // PrintRanges(seed_ranges);
 
-    // seed_to_soil.PrintMaps();
     seed_ranges = seed_to_soil.MapRanges(seed_ranges);
-    // cout << "Soil ranges" << std::endl;
-    // PrintRanges(seed_ranges);
-
-    // soil_to_fert.PrintMaps();
     seed_ranges = soil_to_fert.MapRanges(seed_ranges);
-    // cout << "Fertilizer ranges" << std::endl;
-    // PrintRanges(seed_ranges);
-
-    // fert_to_water.PrintMaps();
     seed_ranges = fert_to_water.MapRanges(seed_ranges);
-    // cout << "Water ranges" << std::endl;
-    // PrintRanges(seed_ranges);
-
-    // water_to_light.PrintMaps();
     seed_ranges = water_to_light.MapRanges(seed_ranges);
-    // cout << "Light ranges" << std::endl;
-    // PrintRanges(seed_ranges);
-    
-    // light_to_temp.PrintMaps();
     seed_ranges = light_to_temp.MapRanges(seed_ranges);
-    // cout << "Temperature ranges" << std::endl;
-    // PrintRanges(seed_ranges);
-
-    // temp_to_humid.PrintMaps();
     seed_ranges = temp_to_humid.MapRanges(seed_ranges);
-    // cout << "Humidity ranges" << std::endl;
-    // PrintRanges(seed_ranges);
-
-    // humid_to_loc.PrintMaps();
     seed_ranges = humid_to_loc.MapRanges(seed_ranges);
-    // cout << "Location ranges" << std::endl;
-    // PrintRanges(seed_ranges);
 
 
     long curr_min = LONG_MAX;
