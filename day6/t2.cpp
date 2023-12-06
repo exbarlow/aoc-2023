@@ -7,17 +7,6 @@
 
 using std::string, std::cout, std::cin, std::vector;
 
-// void ReadNums(string s, vector<int>& vec) {
-//     string num;
-//     std::stringstream stream(s);
-
-//     stream >> num;
-//     while (stream >> num) {
-//         vec.push_back(std::stoi(num));
-//     }
-
-// }
-
 template <typename T>
 void PrintVector(const vector<T>& vec) {
     cout << "[";
@@ -60,27 +49,10 @@ int main(int argc, char* argv[]) {
     time = std::stoull(times_str);
     dist = std::stoull(dist_str);
 
-    cout << time << std::endl;
-    cout << dist << std::endl;
+    long first_win = std::ceil(0.5 * (-1 * std::sqrt(time*time - 4 * dist) + time));
+    long last_win = std::floor(0.5 * (std::sqrt(time*time - 4 * dist) + time));
 
-    uint64_t first_win = 0;
-    uint64_t last_win = 0;
-    
-    for (uint64_t i = 1; i < time; i++) {
-        if ((i * (time-i)) > dist) {
-            first_win = i;
-            break;
-        }
-    }
-
-    for (uint64_t i = time-1; i > 0; i--) {
-        if ((i * (time-i)) > dist) {
-            last_win = i;
-            break;
-        }
-    }
-
-    uint64_t ans = last_win-first_win+1;
+    long ans = last_win-first_win+1;
 
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);

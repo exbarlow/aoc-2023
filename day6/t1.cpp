@@ -3,6 +3,7 @@
 #include <chrono>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 using std::string, std::cout, std::cin, std::vector;
 
@@ -52,20 +53,34 @@ int main(int argc, char* argv[]) {
     ReadNums(times_str, times);
     ReadNums(dist_str, distances);
 
-    vector<int> possible_wins(times.size(),0);
+    vector<long> possible_wins(times.size(),0);
 
     for (int i = 0; i < times.size(); i++) {
         int race_dur = times[i];
-        for (int j = 1; j < times[i]; j++) {
-            if (j * (race_dur-j) > distances[i]) {
-                possible_wins[i]++;
-            }
+        long first_win = std::ceil(0.5 * (-1 * std::sqrt(race_dur * race_dur - 4 * distances[i]) + race_dur));
+        long last_win = std::floor(0.5 * (std::sqrt(race_dur * race_dur - 4 * distances[i]) + race_dur));
+
+        if (last_win * (race_dur-last_win) == distances[i]) {
+            last_win--;
         }
+
+        if (first_win * (race_dur-first_win) == distances[i]) {
+            first_win++;
+        }
+
+        cout << "time: " << times[i] << std::endl;
+        cout << first_win << std::endl;
+        cout << last_win << std::endl;
+        cout << "dist: " << distances[i] << std::endl;
+
+        possible_wins[i] = last_win-first_win+1;
     }
 
     uint64_t ans = 1;
 
-    for (const int& w : possible_wins) {
+    PrintVector(possible_wins);
+
+    for (const long& w : possible_wins) {
         ans *= w;
     }
 
