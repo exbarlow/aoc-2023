@@ -1,12 +1,12 @@
 #include <fstream>
 #include <iostream>
 #include <chrono>
-#include <unordered_map>
-#include <map>
 #include <vector>
+#include <map>
 #include <regex>
+#include <numeric>
 #include <utility>
-#include <stack>
+#include <queue>
 
 using std::string, std::cout, std::cin, std::vector, std::pair;
 
@@ -21,61 +21,6 @@ class Node {
             cout << this->name << "  " << "[" << left->name << "," << right->name << "]\n";
         }
 };
-
-vector<uint64_t> FirstPrimesInMillionNums() {
-    vector<uint64_t> sieve(1000001, 0);
-    vector<uint64_t> primes;
-    size_t curr = 2;
-    while (curr < sieve.size()) {
-        if (sieve[curr] == 1) {
-            curr++;
-            continue;
-        }
-        primes.push_back(curr);
-        for (size_t mult = curr; mult < sieve.size(); mult += curr) {
-            sieve[mult] = 1;
-        }
-        curr++;
-    }
-    return primes;
-}
-
-void PrintPrimeFactorization(const std::unordered_map<uint64_t,int> m) {
-    cout << "starting prime factorization\n";
-    for (const auto& [factor, count] : m) {
-        cout << "\tfactor: " << factor << " count: " << count << '\n';
-    }
-}
-
-std::unordered_map<uint64_t,int> GetPrimeFactors(uint64_t num, const vector<uint64_t>& primes) {
-    size_t curr_prime_idx = 0;
-    std::unordered_map<uint64_t, int> factors;
-    while (num > 1) {
-        uint64_t curr_prime = primes[curr_prime_idx];
-        if (num % curr_prime == 0) {
-            num /= curr_prime;
-            factors[curr_prime]++;
-        }
-        curr_prime_idx++;
-    }
-    return factors;
-
-};
-
-std::unordered_map<uint64_t,int> MergeFactors(std::unordered_map<uint64_t,int>& m1, std::unordered_map<uint64_t,int>& m2) {
-    std::unordered_map<uint64_t, int> merged;
-
-    for (auto& [factor, val] : m1) {
-        int other = m2[factor];
-        merged[factor] = std::max(val, other);
-    }
-
-    for (auto& [factor, val] : m2) {
-        int other = m1[factor];
-        merged[factor] = std::max(val, other);
-    }
-    return merged;
-}
 
 template <typename T>
 void PrintVector(const vector<T>& vec) {
@@ -113,7 +58,6 @@ int main(int argc, char* argv[]) {
     std::unordered_map<string, Node*> nodes;
     vector<vector<string>> node_strs;
     std::regex nodes_regex("(\\w{3})");
-    vector<uint64_t> primes = FirstPrimesInMillionNums();
 
     // read in lines
     while (std::getline(input, line)) {
@@ -149,21 +93,16 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    vector<uint64_t> z_steps;
+    std::queue<uint64_t> z_steps;
     for (const auto& n : curr_nodes) {
-        // cout << "processing node: ";
-        // n->Print();
         std::map<pair<string, char>, uint64_t> visited;
         uint64_t steps = 0;
         Node* curr = n;
         while (true) {
             char instr = instructions[(steps%instructions.size())];
             if (visited.count({curr->name, instr}) && curr->name[2] == 'Z') {
-                // cout << "cycle found on node: ";
-                // curr->Print();
                 uint64_t cycle_len = steps - visited[{curr->name, instr}];
-                // cout << "\tcycle length: " << cycle_len << std::endl;
-                z_steps.push_back(cycle_len);
+                z_steps.push(cycle_len);
                 break;
             }
             visited[{curr->name, instr}] = steps++;
@@ -178,38 +117,13 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    vector<std::unordered_map<uint64_t,int>> pfactors;
-    for (uint64_t n : z_steps) {
-        pfactors.push_back(GetPrimeFactors(n, primes));
+    while (z_steps.size() > 1) {
+        uint64_t z1 = z_steps.front();
+        z_steps.pop();
+        uint64_t z2 = z_steps.front();
+        z_steps.pop();
+        z_steps.push(std::lcm(z1,z2));
     }
-
-
-    std::stack<std::unordered_map<uint64_t,int>> s;
-    for (auto& pf : pfactors) {
-        // PrintPrimeFactorization(pf);
-        s.push(pf);
-    }
-
-    while (s.size() > 1) {
-        auto pf1 = s.top();
-        s.pop();
-        auto pf2 = s.top();
-        s.pop();
-        // PrintPrimeFactorization(pf1);
-        // PrintPrimeFactorization(pf2);
-        auto n = MergeFactors(pf1, pf2);
-        // PrintPrimeFactorization(n);
-        s.push(n);
-    }   
-
-    uint64_t ans = 1;
-
-    // PrintPrimeFactorization(s.top());
-
-    for (auto& [factor, count] : s.top()) {
-        ans *= std::pow(factor, count);
-    }
- 
 
     for (auto& [key, val] : nodes) {
         delete val;
@@ -224,5 +138,5 @@ int main(int argc, char* argv[]) {
         cout << "program runtime: " << duration.count() << " ms" << "\n";
     }
 
-    cout << "steps: " << ans << "\n";
+    cout << "steps: " << z_steps.front() << "\n";
 }
