@@ -6,17 +6,7 @@
 #include <map>
 
 using std::string, std::cout, std::cin, std::pair, std::vector, std::map;
-/* 
 
-Strategy: first read grid into a 2D array -> pad with extra '.'
-Then, scan for pipes, and put them into a dictionary (constructing them as you go)
-{pipe coords: Pipe*}
-
-Then, for each pipe, check which connections it has and connect them
-
-Then, use fast + slow pointers to find cycle, tortoise + hare to find cycle length, and then it should be len/2
-
-*/
 class Coords {
     public:
         Coords(int row, int col): row(row), col(col){}
