@@ -32,8 +32,6 @@ void PrintVector(const vector<T>& vec) {
     cout << "]\n";
 }
 
-/* new approach: find how long it takes each to reach z */
-
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         cout << "Usage is ./task <filename>" <<"\n";
